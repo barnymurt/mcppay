@@ -1,0 +1,35 @@
+{
+  "name": "@mcp-pg/server",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "bin": {
+    "@mcp-pg/server": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --loader ts-node/esm src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mcp-pg/types": "file:../types",
+    "@mcp-pg/ledger": "file:../ledger",
+    "@mcp-pg/rails": "file:../rails",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "dotenv": "^16.0.0",
+    "pino": "^9.0.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.3.0"
+  }
+}
