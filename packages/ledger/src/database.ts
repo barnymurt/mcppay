@@ -18,7 +18,8 @@ export class Ledger {
     
     this.db = new Database(resolvedPath);
     this.db.pragma('journal_mode = WAL');
-    this.migrationsPath = path.resolve(__dirname, '../../migrations');
+    this.db.pragma('foreign_keys = ON');
+    this.migrationsPath = path.resolve(__dirname, '../../../migrations');
   }
 
   get raw(): Database.Database {

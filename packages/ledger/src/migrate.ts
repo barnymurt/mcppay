@@ -6,6 +6,8 @@ export function runMigrations(ledger: Ledger): void {
   const db = ledger.raw;
   const migrationsDir = ledger.getMigrationsPath();
 
+  db.exec('PRAGMA foreign_keys = ON;');
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS _migrations (
       id INTEGER PRIMARY KEY,
