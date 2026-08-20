@@ -3,18 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "description": "MCP-native payment gateway for AI agents",
+  "type": "module",
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "dev": "npm run dev --workspaces --if-present",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "test:flow": "node --import tsx scripts/test-esm.mjs"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
+    "tsx": "^4.19.0",
     "typescript": "^5.3.0",
     "vitest": "^1.2.0"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@mcp-pg/types": "file:./packages/types",
+    "@mcp-pg/ledger": "file:./packages/ledger",
+    "@mcp-pg/rails": "file:./packages/rails"
   }
 }

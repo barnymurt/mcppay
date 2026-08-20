@@ -1,7 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Ledger as LedgerType } from '@mcp-pg/ledger';
 import type { ServerConfig } from '../config.js';
-import { getQuote, consumeQuote, getAccount, getTool, createPayment, createReceipt, deductBalanceUsd, deductBalanceGero } from '@mcp-pg/ledger';
+import { getQuote, consumeQuote, getAccount, getTool, createPayment, createReceipt, deductBalanceUsd, deductBalanceGero, deductBalanceBtc } from '@mcp-pg/ledger';
 import { resolveRail } from '@mcp-pg/rails';
 import { ErrorCode, computeAuditHash } from '@mcp-pg/types';
 import { v4 as uuid } from 'uuid';
@@ -91,16 +91,19 @@ export function registerPayForToolCall(
           };
         }
 
-        const rail = resolveRail(account, config);
-        const paymentResult = await rail.processPayment({ quote, account });
+        const currency = quote.currency || 'USD';
+        const rail = resolveRail(account, config, currency);
+        const paymentResult = await rail.processPayment({ quote, account, currency });
 
         const receiptId = `receipt_${uuid()}`;
         const timestamp = new Date().toISOString();
 
         let newBalance: number;
         
-        if (quote.amount_gero && quote.amount_gero > 0 && account.rail === 'gerorail') {
-          newBalance = deductBalanceGero(ledger, account_id, quote.amount_gero);
+        if (currency === 'GERO' && quote.amount_gero) {
+          newBalance = Number(deductBalanceGero(ledger, account_id, BigInt(quote.amount_gero)));
+        } else if (currency === 'BTC' && quote.amount_btc) {
+          newBalance = Number(deductBalanceBtc(ledger, account_id, BigInt(quote.amount_btc)));
         } else {
           newBalance = deductBalanceUsd(ledger, account_id, quote.amount_usd);
         }
@@ -112,6 +115,8 @@ export function registerPayForToolCall(
           account_id,
           amount_usd: quote.amount_usd,
           amount_gero: quote.amount_gero,
+          amount_btc: quote.amount_btc,
+          currency,
           status: paymentResult.status === 'settled' ? 'settled' : 'pending',
           rail: rail.name,
           rail_tx_id: paymentResult.railTxId,
@@ -125,6 +130,8 @@ export function registerPayForToolCall(
           account_id,
           amount_usd: quote.amount_usd,
           amount_gero: quote.amount_gero,
+          amount_btc: quote.amount_btc,
+          currency,
           timestamp,
         });
 
@@ -134,6 +141,8 @@ export function registerPayForToolCall(
           account_id,
           amount_usd: quote.amount_usd,
           amount_gero: quote.amount_gero,
+          amount_btc: quote.amount_btc,
+          currency,
           rail: rail.name,
           status: 'success',
           audit_hash: auditHash,

@@ -1,4 +1,5 @@
-export type Rail = 'sandbox' | 'stripe' | 'gerorail' | 'bank';
+export type Currency = 'USD' | 'GERO' | 'BTC';
+export type Rail = 'sandbox' | 'stripe' | 'gerorail' | 'btc' | 'bank';
 
 export type ApiScope =
   | 'balance:read'

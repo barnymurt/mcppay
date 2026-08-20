@@ -1,5 +1,4 @@
 export * from './database.js';
-export * from './migrate.js';
 export * from './accounts.js';
 export * from './api-keys.js';
 export * from './quotes.js';
@@ -7,3 +6,5 @@ export * from './payments.js';
 export * from './receipts.js';
 export * from './tools.js';
 export * from './balance.js';
+export * from './fees.js';
+export * from './stats.js';

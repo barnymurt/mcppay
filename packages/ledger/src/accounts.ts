@@ -7,6 +7,7 @@ export interface CreateAccountParams {
   rail?: Rail;
   balance_usd?: number;
   balance_gero?: number;
+  balance_btc?: number;
   wallet_address?: string;
 }
 
@@ -21,14 +22,15 @@ export function createAccount(ledger: Ledger, params: CreateAccountParams): Acco
   const depositIndex = (maxIndex.max ?? -1) + 1;
 
   db.prepare(`
-    INSERT INTO accounts (id, name, rail, balance_usd, balance_gero, wallet_address, deposit_index, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO accounts (id, name, rail, balance_usd, balance_gero, balance_btc, wallet_address, deposit_index, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     id,
     params.name,
     params.rail || 'sandbox',
     params.balance_usd || 0,
     params.balance_gero || 0,
+    params.balance_btc || 0,
     params.wallet_address || null,
     depositIndex,
     now
@@ -40,6 +42,7 @@ export function createAccount(ledger: Ledger, params: CreateAccountParams): Acco
     rail: params.rail || 'sandbox',
     balance_usd: params.balance_usd || 0,
     balance_gero: params.balance_gero || 0,
+    balance_btc: params.balance_btc || 0,
     wallet_address: params.wallet_address,
     deposit_index: depositIndex,
     created_at: now,
@@ -57,6 +60,7 @@ export function getAccount(ledger: Ledger, id: string): Account | undefined {
     rail: row.rail,
     balance_usd: row.balance_usd,
     balance_gero: row.balance_gero,
+    balance_btc: row.balance_btc || 0,
     wallet_address: row.wallet_address,
     deposit_index: row.deposit_index,
     created_at: row.created_at,
@@ -74,6 +78,7 @@ export function getAccountByWalletAddress(ledger: Ledger, walletAddress: string)
     rail: row.rail,
     balance_usd: row.balance_usd,
     balance_gero: row.balance_gero,
+    balance_btc: row.balance_btc || 0,
     wallet_address: row.wallet_address,
     deposit_index: row.deposit_index,
     created_at: row.created_at,

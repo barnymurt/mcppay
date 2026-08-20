@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { Ledger } from './database.js';
-import type { Receipt, Rail } from '@mcp-pg/types';
+import type { Receipt, Rail, Currency } from '@mcp-pg/types';
 
 export interface CreateReceiptParams {
   payment_id: string;
@@ -8,6 +8,10 @@ export interface CreateReceiptParams {
   account_id: string;
   amount_usd: number;
   amount_gero?: number;
+  amount_btc?: number;
+  currency?: Currency;
+  mcp_fee_gero?: number;
+  mcp_fee_btc?: number;
   rail: Rail;
   status: 'success' | 'failed';
   audit_hash: string;
@@ -17,10 +21,11 @@ export function createReceipt(ledger: Ledger, params: CreateReceiptParams): Rece
   const db = ledger.raw;
   const id = `receipt_${uuid()}`;
   const now = new Date().toISOString();
+  const currency = params.currency || 'USD';
 
   db.prepare(`
-    INSERT INTO receipts (id, payment_id, tool_id, account_id, amount_usd, amount_gero, rail, status, timestamp, audit_hash)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO receipts (id, payment_id, tool_id, account_id, amount_usd, amount_gero, amount_btc, currency, mcp_fee_gero, mcp_fee_btc, rail, status, timestamp, audit_hash)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     id,
     params.payment_id,
@@ -28,6 +33,10 @@ export function createReceipt(ledger: Ledger, params: CreateReceiptParams): Rece
     params.account_id,
     params.amount_usd,
     params.amount_gero || null,
+    params.amount_btc || null,
+    currency,
+    params.mcp_fee_gero || null,
+    params.mcp_fee_btc || null,
     params.rail,
     params.status,
     now,
@@ -41,6 +50,10 @@ export function createReceipt(ledger: Ledger, params: CreateReceiptParams): Rece
     account_id: params.account_id,
     amount_usd: params.amount_usd,
     amount_gero: params.amount_gero,
+    amount_btc: params.amount_btc,
+    currency,
+    mcp_fee_gero: params.mcp_fee_gero,
+    mcp_fee_btc: params.mcp_fee_btc,
     rail: params.rail,
     status: params.status,
     timestamp: now,
@@ -60,6 +73,10 @@ export function getReceipt(ledger: Ledger, id: string): Receipt | undefined {
     account_id: row.account_id,
     amount_usd: row.amount_usd,
     amount_gero: row.amount_gero,
+    amount_btc: row.amount_btc,
+    currency: row.currency || 'USD',
+    mcp_fee_gero: row.mcp_fee_gero,
+    mcp_fee_btc: row.mcp_fee_btc,
     rail: row.rail,
     status: row.status,
     timestamp: row.timestamp,
@@ -98,6 +115,10 @@ export function getReceiptsByAccount(
     account_id: row.account_id,
     amount_usd: row.amount_usd,
     amount_gero: row.amount_gero,
+    amount_btc: row.amount_btc,
+    currency: row.currency || 'USD',
+    mcp_fee_gero: row.mcp_fee_gero,
+    mcp_fee_btc: row.mcp_fee_btc,
     rail: row.rail,
     status: row.status,
     timestamp: row.timestamp,

@@ -1,12 +1,16 @@
 import { v4 as uuid } from 'uuid';
 import { Ledger } from './database.js';
-import type { Payment, PaymentStatus, Rail, ErrorCode } from '@mcp-pg/types';
+import type { Payment, PaymentStatus, Rail, ErrorCode, Currency } from '@mcp-pg/types';
 
 export interface CreatePaymentParams {
   quote_id: string;
   account_id: string;
   amount_usd: number;
   amount_gero?: number;
+  amount_btc?: number;
+  currency?: Currency;
+  mcp_fee_gero?: number;
+  mcp_fee_btc?: number;
   status: PaymentStatus;
   rail: Rail;
   rail_tx_id?: string;
@@ -19,16 +23,21 @@ export function createPayment(ledger: Ledger, params: CreatePaymentParams): Paym
   const db = ledger.raw;
   const id = uuid();
   const now = new Date().toISOString();
+  const currency = params.currency || 'USD';
 
   db.prepare(`
-    INSERT INTO payments (id, quote_id, account_id, amount_usd, amount_gero, status, rail, rail_tx_id, receipt_id, error_code, created_at, settled_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO payments (id, quote_id, account_id, amount_usd, amount_gero, amount_btc, currency, mcp_fee_gero, mcp_fee_btc, status, rail, rail_tx_id, receipt_id, error_code, created_at, settled_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     id,
     params.quote_id,
     params.account_id,
     params.amount_usd,
     params.amount_gero || null,
+    params.amount_btc || null,
+    currency,
+    params.mcp_fee_gero || null,
+    params.mcp_fee_btc || null,
     params.status,
     params.rail,
     params.rail_tx_id || null,
@@ -44,6 +53,10 @@ export function createPayment(ledger: Ledger, params: CreatePaymentParams): Paym
     account_id: params.account_id,
     amount_usd: params.amount_usd,
     amount_gero: params.amount_gero,
+    amount_btc: params.amount_btc,
+    currency,
+    mcp_fee_gero: params.mcp_fee_gero,
+    mcp_fee_btc: params.mcp_fee_btc,
     status: params.status,
     rail: params.rail,
     rail_tx_id: params.rail_tx_id,
@@ -65,6 +78,10 @@ export function getPayment(ledger: Ledger, id: string): Payment | undefined {
     account_id: row.account_id,
     amount_usd: row.amount_usd,
     amount_gero: row.amount_gero,
+    amount_btc: row.amount_btc,
+    currency: row.currency || 'USD',
+    mcp_fee_gero: row.mcp_fee_gero,
+    mcp_fee_btc: row.mcp_fee_btc,
     status: row.status,
     rail: row.rail,
     rail_tx_id: row.rail_tx_id,
@@ -86,6 +103,10 @@ export function getPaymentByRailTxId(ledger: Ledger, railTxId: string): Payment 
     account_id: row.account_id,
     amount_usd: row.amount_usd,
     amount_gero: row.amount_gero,
+    amount_btc: row.amount_btc,
+    currency: row.currency || 'USD',
+    mcp_fee_gero: row.mcp_fee_gero,
+    mcp_fee_btc: row.mcp_fee_btc,
     status: row.status,
     rail: row.rail,
     rail_tx_id: row.rail_tx_id,
