@@ -1,4 +1,5 @@
 // @ts-nocheck
+import path from 'path';
 import 'dotenv/config';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -13,7 +14,11 @@ async function main() {
 
   logger.info({ config: { ...config, API_KEY_SALT: '***', JWT_SECRET: '***' } }, 'Starting MCP Payment Gateway');
 
-  const ledger = createLedger({ path: config.LEDGER_DB_PATH });
+  const migrationsPath = process.env.MIGRATIONS_PATH || 'C:/Dev/MCPpay/migrations';
+  const ledger = createLedger({
+    path: config.LEDGER_DB_PATH,
+    migrationsPath,
+  });
   
   try {
     runMigrations(ledger);

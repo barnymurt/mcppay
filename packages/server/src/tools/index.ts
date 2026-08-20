@@ -7,6 +7,9 @@ import { registerGetReceipt } from './get-receipt.js';
 import { registerGetBalance } from './get-balance.js';
 import { registerTopUpBalance } from './top-up-balance.js';
 import { registerAuthorizeAndPay } from './authorize-and-pay.js';
+import { registerStakeGero } from './stake-gero.js';
+import { registerUnstakeGero } from './unstake-gero.js';
+import { registerGetStakeStatus } from './get-stake-status.js';
 
 export function registerTools(
   server: McpServer,
@@ -19,4 +22,7 @@ export function registerTools(
   registerGetBalance(server, ledger, config);
   registerTopUpBalance(server, ledger, config);
   registerAuthorizeAndPay(server, ledger, config);
+  registerStakeGero(server, ledger, config);
+  registerUnstakeGero(server, ledger, config);
+  registerGetStakeStatus(server, ledger, config);
 }

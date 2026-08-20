@@ -8,3 +8,5 @@ export * from './tools.js';
 export * from './balance.js';
 export * from './fees.js';
 export * from './stats.js';
+export * from './tier.js';
+export * from './staking.js';

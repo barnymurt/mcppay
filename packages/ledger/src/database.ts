@@ -5,6 +5,7 @@ const require2 = createRequire(import.meta.url);
 
 export interface DatabaseOptions {
   path?: string;
+  migrationsPath?: string;
 }
 
 export class Ledger {
@@ -15,11 +16,11 @@ export class Ledger {
     const Database = require2('better-sqlite3');
     const dbPath = options.path || process.env.LEDGER_DB_PATH || './data/ledger.db';
     const resolvedPath = path.isAbsolute(dbPath) ? dbPath : path.resolve(process.cwd(), dbPath);
-    
+
     this.db = new Database(resolvedPath);
     this.db.pragma('journal_mode = WAL');
     this.db.pragma('foreign_keys = ON');
-    this.migrationsPath = path.resolve(process.cwd(), 'migrations');
+    this.migrationsPath = options.migrationsPath || path.resolve(process.cwd(), 'migrations');
   }
 
   get raw(): any {

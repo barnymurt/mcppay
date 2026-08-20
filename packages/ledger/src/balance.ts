@@ -71,7 +71,7 @@ export function deductBalanceGero(
       throw new AppError(ErrorCode.INSUFFICIENT_BALANCE, 'GERO balance race condition — retry');
     }
 
-    return account.balance_gero - amountGero;
+    return BigInt(account.balance_gero) - amountGero;
   });
 }
 

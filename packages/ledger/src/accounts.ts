@@ -22,8 +22,8 @@ export function createAccount(ledger: Ledger, params: CreateAccountParams): Acco
   const depositIndex = (maxIndex.max ?? -1) + 1;
 
   db.prepare(`
-    INSERT INTO accounts (id, name, rail, balance_usd, balance_gero, balance_btc, wallet_address, deposit_index, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO accounts (id, name, rail, balance_usd, balance_gero, balance_btc, wallet_address, deposit_index, created_at, gero_staked, gero_staked_usd_at_stake, stake_tier, unstake_amount)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 0)
   `).run(
     id,
     params.name,
@@ -46,6 +46,10 @@ export function createAccount(ledger: Ledger, params: CreateAccountParams): Acco
     wallet_address: params.wallet_address,
     deposit_index: depositIndex,
     created_at: now,
+    gero_staked: 0,
+    gero_staked_usd_at_stake: 0,
+    stake_tier: 0,
+    unstake_amount: 0,
   };
 }
 
@@ -64,6 +68,12 @@ export function getAccount(ledger: Ledger, id: string): Account | undefined {
     wallet_address: row.wallet_address,
     deposit_index: row.deposit_index,
     created_at: row.created_at,
+    gero_staked: row.gero_staked || 0,
+    gero_staked_usd_at_stake: row.gero_staked_usd_at_stake || 0,
+    stake_tier: row.stake_tier || 0,
+    staked_at: row.staked_at || null,
+    unstake_pending_at: row.unstake_pending_at || null,
+    unstake_amount: row.unstake_amount || 0,
   };
 }
 
@@ -82,6 +92,12 @@ export function getAccountByWalletAddress(ledger: Ledger, walletAddress: string)
     wallet_address: row.wallet_address,
     deposit_index: row.deposit_index,
     created_at: row.created_at,
+    gero_staked: row.gero_staked || 0,
+    gero_staked_usd_at_stake: row.gero_staked_usd_at_stake || 0,
+    stake_tier: row.stake_tier || 0,
+    staked_at: row.staked_at || null,
+    unstake_pending_at: row.unstake_pending_at || null,
+    unstake_amount: row.unstake_amount || 0,
   };
 }
 

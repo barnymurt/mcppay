@@ -32,6 +32,7 @@ const toggleMode = () => {
     <nav class="nav">
       <router-link to="/dashboard">Operator Dashboard</router-link>
       <router-link to="/agent-flow">Agent Flow</router-link>
+      <router-link to="/staking">Staking</router-link>
       <router-link to="/stats">Public Stats</router-link>
     </nav>
 

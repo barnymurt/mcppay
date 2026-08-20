@@ -25,7 +25,8 @@ async function init() {
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  const ledger = createLedger({ path: config.LEDGER_DB_PATH });
+  const migrationsPath = process.env.MIGRATIONS_PATH || 'C:/Dev/MCPpay/migrations';
+  const ledger = createLedger({ path: config.LEDGER_DB_PATH, migrationsPath });
   
   try {
     runMigrations(ledger);
