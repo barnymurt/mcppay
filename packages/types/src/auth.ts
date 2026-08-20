@@ -1,4 +1,4 @@
-export type Currency = 'USD' | 'GERO' | 'BTC';
+export type Currency = 'USD' | 'GERO' | 'BTC' | 'ADA' | 'NIGHT';
 export type Rail = 'sandbox' | 'stripe' | 'gerorail' | 'btc' | 'bank';
 
 export type ApiScope =

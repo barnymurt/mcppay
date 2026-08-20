@@ -167,7 +167,7 @@ export function creditBalanceBtc(
 ): bigint {
   return ledger.transaction(() => {
     const db = ledger.raw;
-    
+
     const account = db.prepare(
       'SELECT balance_btc FROM accounts WHERE id = ?'
     ).get(accountId) as { balance_btc: bigint } | undefined;
@@ -181,5 +181,127 @@ export function creditBalanceBtc(
     ).run(Number(amountBtc), accountId);
 
     return account.balance_btc + amountBtc;
+  });
+}
+
+export function deductBalanceAda(
+  ledger: Ledger,
+  accountId: string,
+  amountAda: bigint
+): bigint {
+  return ledger.transaction(() => {
+    const db = ledger.raw;
+
+    const account = db.prepare(
+      'SELECT balance_ada FROM accounts WHERE id = ?'
+    ).get(accountId) as { balance_ada: bigint } | undefined;
+
+    if (!account) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_FOUND, `Account ${accountId} not found`);
+    }
+
+    if (account.balance_ada < amountAda) {
+      throw new AppError(
+        ErrorCode.INSUFFICIENT_BALANCE,
+        `ADA Balance ${account.balance_ada} < required ${amountAda}`,
+        402,
+        { balance_ada: Number(account.balance_ada), required: Number(amountAda) }
+      );
+    }
+
+    const result = db.prepare(
+      'UPDATE accounts SET balance_ada = balance_ada - ? WHERE id = ? AND balance_ada >= ?'
+    ).run(Number(amountAda), accountId, Number(amountAda));
+
+    if (result.changes !== 1) {
+      throw new AppError(ErrorCode.INSUFFICIENT_BALANCE, 'ADA balance race condition — retry');
+    }
+
+    return BigInt(account.balance_ada) - amountAda;
+  });
+}
+
+export function creditBalanceAda(
+  ledger: Ledger,
+  accountId: string,
+  amountAda: bigint
+): bigint {
+  return ledger.transaction(() => {
+    const db = ledger.raw;
+
+    const account = db.prepare(
+      'SELECT balance_ada FROM accounts WHERE id = ?'
+    ).get(accountId) as { balance_ada: bigint } | undefined;
+
+    if (!account) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_FOUND, `Account ${accountId} not found`);
+    }
+
+    db.prepare(
+      'UPDATE accounts SET balance_ada = balance_ada + ? WHERE id = ?'
+    ).run(Number(amountAda), accountId);
+
+    return BigInt(account.balance_ada) + amountAda;
+  });
+}
+
+export function deductBalanceNight(
+  ledger: Ledger,
+  accountId: string,
+  amountNight: bigint
+): bigint {
+  return ledger.transaction(() => {
+    const db = ledger.raw;
+
+    const account = db.prepare(
+      'SELECT balance_night FROM accounts WHERE id = ?'
+    ).get(accountId) as { balance_night: bigint } | undefined;
+
+    if (!account) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_FOUND, `Account ${accountId} not found`);
+    }
+
+    if (account.balance_night < amountNight) {
+      throw new AppError(
+        ErrorCode.INSUFFICIENT_BALANCE,
+        `NIGHT Balance ${account.balance_night} < required ${amountNight}`,
+        402,
+        { balance_night: Number(account.balance_night), required: Number(amountNight) }
+      );
+    }
+
+    const result = db.prepare(
+      'UPDATE accounts SET balance_night = balance_night - ? WHERE id = ? AND balance_night >= ?'
+    ).run(Number(amountNight), accountId, Number(amountNight));
+
+    if (result.changes !== 1) {
+      throw new AppError(ErrorCode.INSUFFICIENT_BALANCE, 'NIGHT balance race condition — retry');
+    }
+
+    return BigInt(account.balance_night) - amountNight;
+  });
+}
+
+export function creditBalanceNight(
+  ledger: Ledger,
+  accountId: string,
+  amountNight: bigint
+): bigint {
+  return ledger.transaction(() => {
+    const db = ledger.raw;
+
+    const account = db.prepare(
+      'SELECT balance_night FROM accounts WHERE id = ?'
+    ).get(accountId) as { balance_night: bigint } | undefined;
+
+    if (!account) {
+      throw new AppError(ErrorCode.ACCOUNT_NOT_FOUND, `Account ${accountId} not found`);
+    }
+
+    db.prepare(
+      'UPDATE accounts SET balance_night = balance_night + ? WHERE id = ?'
+    ).run(Number(amountNight), accountId);
+
+    return BigInt(account.balance_night) + amountNight;
   });
 }

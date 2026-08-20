@@ -13,8 +13,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '../../../');
 const config = getConfig();
 const dbPath = path.resolve(projectRoot, config.LEDGER_DB_PATH);
+const migrationsPath = process.env.MIGRATIONS_PATH || path.resolve(projectRoot, 'migrations');
 console.log('DB Path:', dbPath);
-const ledger = createLedger({ path: dbPath });
+console.log('Migrations Path:', migrationsPath);
+const ledger = createLedger({ path: dbPath, migrationsPath });
 runMigrations(ledger);
 
 const API_KEY = 'mpg_test_fyIs8o7kjD23tirFC-ZwAA';

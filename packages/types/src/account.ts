@@ -7,6 +7,8 @@ export interface Account {
   balance_usd: number;
   balance_gero: number;
   balance_btc: number;
+  balance_ada: number;
+  balance_night: number;
   wallet_address?: string;
   deposit_index?: number;
   created_at: string;
